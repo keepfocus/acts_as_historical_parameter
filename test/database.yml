@@ -1,10 +1,10 @@
 sqlite:
   :adapter: sqlite
-  :database: test/acts_historical_parameter_plugin.sqlite.db
+  :database: vendor/plugins/acts_as_historical_parameter/test/acts_as_historical_parameter_plugin.sqlite.db
 
 sqlite3:
   :adapter: sqlite3
-  :database: test/acts_historical_parameter_plugin.sqlite3.db
+  :database: vendor/plugins/acts_as_historical_parameter/test/acts_as_historical_parameter_plugin.sqlite3.db
 
 postgresql:
   :adapter: postgresql
