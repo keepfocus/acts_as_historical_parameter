@@ -1,8 +1,17 @@
 require 'test_helper'
 
 class ActsAsHistoricalParameterTest < ActiveSupport::TestCase
-  # Replace this with your real tests.
-  test "the truth" do
-    assert true
+  load_schema
+
+  class Installation < ActiveRecord::Base
+  end
+
+  class HistoricParameter < ActiveRecord::Base
+    belongs_to :parameterized, :polymorphic => true
+  end
+
+  test "schema has loaded correctly" do
+    assert_equal [], Installation.all
+    assert_equal [], HistoricParameter.all
   end
 end
