@@ -37,6 +37,23 @@ module ActsAsHistoricalParameter
           nil
         end
       end      
+      class_eval <<-EOM
+        def #{name}_sum(start_time, end_time)
+          #{name}_values.sum do |entry|
+            if entry[1] and start_time < entry[1]
+              if start_time > entry[0]
+                yield start_time, entry[1], entry[2]
+              else
+                yield entry[0], entry[1], entry[2]
+              end
+            elsif entry[1].nil? and end_time > entry[0]
+              yield entry[0], end_time, entry[2]
+            else
+              0
+            end
+          end
+        end
+      EOM
     end
   end
 end

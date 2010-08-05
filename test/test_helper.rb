@@ -3,9 +3,12 @@ ENV['RAILS_ROOT'] ||= File.dirname(__FILE__) + '/../../../..'
 
 require 'rubygems'
 require 'test/unit'
+require 'rr'
 require File.expand_path(File.join(ENV['RAILS_ROOT'], 'config/environment.rb'))
 
 class ActiveSupport::TestCase
+  include RR::Adapters::TestUnit
+
   def self.load_schema
     config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
     ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/debug.log")
