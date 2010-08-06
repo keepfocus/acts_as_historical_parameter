@@ -4,13 +4,15 @@ module ActsAsHistoricalParameter
   end
 
   module ClassMethods
-    def acts_as_historical_parameter(name, ident)
-      has_many :historic_parameters, :as => :parameterized unless defined? historic_parameters      
+    def define_historical_getter(name, ident)
       define_method(name) do
         @historical_parameters ||= {}
         @historical_parameters[name] ||= historic_parameters.first :conditions => ["ident = ?", ident], :order => "valid_from DESC"
         @historical_parameters[name].value
       end
+    end
+
+    def define_historical_setter(name, ident)
       define_method("set_#{name}") do |value, from|
         @historical_parameters ||= {}
         @historical_parameters[name] = historic_parameters.build :ident => ident, :valid_from => from, :value => value
@@ -18,6 +20,9 @@ module ActsAsHistoricalParameter
       define_method("#{name}=") do |value|
         self.send "set_#{name}", value, Time.zone.now
       end
+    end
+
+    def define_historical_values(name, ident)
       define_method("#{name}_values") do
         hps = historic_parameters.all(:conditions => ["ident = ?", ident], :order => "valid_from")
         values = []
@@ -37,6 +42,9 @@ module ActsAsHistoricalParameter
           nil
         end
       end      
+    end
+
+    def define_historical_sum(name)
       class_eval <<-EOM
         def #{name}_sum(start_time, end_time)
           #{name}_values.sum do |entry|
@@ -54,6 +62,14 @@ module ActsAsHistoricalParameter
           end
         end
       EOM
+    end
+
+    def acts_as_historical_parameter(name, ident)
+      has_many :historic_parameters, :as => :parameterized unless defined? historic_parameters
+      define_historical_getter(name, ident)
+      define_historical_setter(name, ident)
+      define_historical_values(name, ident)
+      define_historical_sum(name)
     end
   end
 end
