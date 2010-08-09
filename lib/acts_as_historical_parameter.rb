@@ -1,3 +1,10 @@
+%w{ models }.each do |dir|
+  path = File.join(File.dirname(__FILE__), 'app', dir)
+  $LOAD_PATH << path
+  ActiveSupport::Dependencies.autoload_paths << path
+  ActiveSupport::Dependencies.autoload_once_paths.delete(path)
+end
+
 module ActsAsHistoricalParameter
   def self.included(base)
     base.extend(ClassMethods)
@@ -6,16 +13,16 @@ module ActsAsHistoricalParameter
   module ClassMethods
     def define_historical_getter(name, ident)
       define_method(name) do
-        @historical_parameters ||= {}
-        @historical_parameters[name] ||= historic_parameters.first :conditions => ["ident = ?", ident], :order => "valid_from DESC"
-        @historical_parameters[name].value
+        @historical_parameter ||= {}
+        @historical_parameter[name] ||= historical_parameters.first :conditions => ["ident = ?", ident], :order => "valid_from DESC"
+        @historical_parameter[name].value
       end
     end
 
     def define_historical_setter(name, ident)
       define_method("set_#{name}") do |value, from|
-        @historical_parameters ||= {}
-        @historical_parameters[name] = historic_parameters.build :ident => ident, :valid_from => from, :value => value
+        @historical_parameter ||= {}
+        @historical_parameter[name] = historical_parameters.build :ident => ident, :valid_from => from, :value => value
       end
       define_method("#{name}=") do |value|
         self.send "set_#{name}", value, Time.zone.now
@@ -24,7 +31,7 @@ module ActsAsHistoricalParameter
 
     def define_historical_values(name, ident)
       define_method("#{name}_values") do
-        hps = historic_parameters.all(:conditions => ["ident = ?", ident], :order => "valid_from")
+        hps = historical_parameters.all(:conditions => ["ident = ?", ident], :order => "valid_from")
         values = []
         if hps.length >= 2
           values = hps.each_cons(2).collect do |a|
@@ -65,7 +72,7 @@ module ActsAsHistoricalParameter
     end
 
     def acts_as_historical_parameter(name, ident)
-      has_many :historic_parameters, :as => :parameterized unless defined? historic_parameters
+      has_many :historical_parameters, :as => :parameterized unless defined? historical_parameters
       define_historical_getter(name, ident)
       define_historical_setter(name, ident)
       define_historical_values(name, ident)
