@@ -23,6 +23,18 @@ class ActsAsHistoricalParameterTest < ActiveSupport::TestCase
     assert_equal 42.0, installation.area
   end
 
+  test "historic parameter ignores set to nil value" do
+    installation = Installation.new
+    installation.area = 42.0
+    installation.area = nil
+    assert_equal 42.0, installation.area
+  end
+
+  test "historic parameter can be undefined" do
+    installation = Installation.new
+    assert_nil installation.area
+  end
+
   test "historic parameter has a history" do
     installation = Installation.new
     installation.set_area(42, Time.zone.local(2010, 01, 01))

@@ -20,14 +20,16 @@ module ActsAsHistoricalParameter
       define_method(name) do
         @historical_parameter ||= {}
         @historical_parameter[name] ||= historical_parameters.first :conditions => ["ident = ?", ident], :order => "valid_from DESC"
-        @historical_parameter[name].value
+        @historical_parameter[name].value if @historical_parameter[name]
       end
     end
 
     def define_historical_setter(name, ident)
       define_method("set_#{name}") do |value, from|
-        @historical_parameter ||= {}
-        @historical_parameter[name] = historical_parameters.build :ident => ident, :valid_from => from, :value => value
+        if value
+          @historical_parameter ||= {}
+          @historical_parameter[name] = historical_parameters.build :ident => ident, :valid_from => from, :value => value
+        end
       end
       define_method("#{name}=") do |value|
         self.send "set_#{name}", value, Time.zone.now
