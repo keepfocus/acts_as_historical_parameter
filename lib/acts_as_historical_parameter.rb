@@ -79,7 +79,10 @@ module ActsAsHistoricalParameter
     end
 
     def acts_as_historical_parameter(name, ident)
-      has_many :historical_parameters, :as => :parameterized unless defined? historical_parameters
+      unless defined? historical_parameters
+        has_many :historical_parameters, :as => :parameterized
+        accepts_nested_attributes_for :historical_parameters
+      end
       define_historical_getter(name, ident)
       define_historical_setter(name, ident)
       define_historical_values(name, ident)
