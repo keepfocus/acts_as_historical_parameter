@@ -105,4 +105,21 @@ class ActsAsHistoricalParameterTest < ActiveSupport::TestCase
     assert_equal expected, installation.area_values
   end
 
+  test "edit parameter history through model (direct association)" do
+    installation = Installation.new
+    installation.update_attributes({
+      :area_history_attributes => [
+        {:valid_from => Time.zone.local(2010, 1, 1), :value => 42},
+        {:valid_from => Time.zone.local(2010, 2, 1), :value => 43}
+      ]
+    })
+    installation.save
+    assert_equal 43, installation.area
+    expected = [
+      [Time.zone.local(2010, 01, 01), Time.zone.local(2010, 02, 01), 42],
+      [Time.zone.local(2010, 02, 01), nil, 43]
+    ]
+    assert_equal expected, installation.area_values
+  end
+
 end
