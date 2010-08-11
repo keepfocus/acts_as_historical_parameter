@@ -1,13 +1,31 @@
 ActsAsHistoricalParameter
 =========================
 
-Introduction goes here.
+System and models for working with historically changeing parameters.
 
 
 Example
 =======
 
-Example goes here.
+class IceCream << ActiveRecord::Base
+  # Enable a historical parameter price with id 1
+  acts_as_historical_parameter :price, 1
 
+  def get_sales_for_period(period_start, period_end)
+    # Do some magic to load # of icecreams of this type
+    # sold in the given period
+  end
 
-Copyright (c) 2010 [name of plugin creator], released under the MIT license
+  def get_earnings_for_period(period_start, period_end)
+    # Use block sumation to calculate
+    price_sum do |period_start, period_end, price|
+      # Multiply current price by # of icecreams sold
+      get_sales_for_period(period_start, period_end) * value
+    end
+  end
+end
+
+# Load income from first ice for year to date.
+IceCream.find(1).get_earnings_for_period(Time.zone.now.beginning_of_year, Time.zone.now)
+
+Copyright (c) 2010 KeepFocus A/S, released under the MIT license
