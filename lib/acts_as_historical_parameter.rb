@@ -16,46 +16,50 @@ module ActsAsHistoricalParameter
   end
 
   module ClassMethods
-    def define_historical_getter(name, ident)
-      define_method(name) do
-        @historical_parameter ||= {}
-        @historical_parameter[name] ||= historical_parameters.first :conditions => ["ident = ?", ident], :order => "valid_from DESC"
-        @historical_parameter[name].value if @historical_parameter[name]
-      end
-    end
-
-    def define_historical_setter(name, ident)
-      define_method("set_#{name}") do |value, from|
-        if value
-          @historical_parameter ||= {}
-          @historical_parameter[name] = historical_parameters.build :ident => ident, :valid_from => from, :value => value
+    def define_historical_getter(name)
+      class_eval <<-EOM
+        def #{name}
+          @#{name} ||= #{name}_history.first :order => "valid_from DESC"
+          @#{name}.value if @#{name}
         end
-      end
-      define_method("#{name}=") do |value|
-        self.send "set_#{name}", value, Time.zone.now
-      end
+      EOM
     end
 
-    def define_historical_values(name, ident)
-      define_method("#{name}_values") do
-        hps = historical_parameters.all(:conditions => ["ident = ?", ident], :order => "valid_from")
-        values = []
-        if hps.length >= 2
-          values = hps.each_cons(2).collect do |a|
-            [
-              a[0].valid_from,
-              a[1].valid_from,
-              a[0].value
-            ]
+    def define_historical_setter(name)
+      class_eval <<-EOM
+        def set_#{name}(value, from)
+          if value
+            @#{name} = #{name}_history.build :valid_from => from, :value => value
           end
         end
-        lv = hps.last
-        if lv
-          values + [[lv.valid_from, nil, lv.value]]
-        else
-          nil
+        def #{name}=(value)
+          self.set_#{name}(value, Time.zone.now)
         end
-      end      
+      EOM
+    end
+
+    def define_historical_values(name)
+      class_eval <<-EOM
+        def #{name}_values
+          hps = #{name}_history.all(:order => "valid_from")
+          values = []
+          if hps.length >= 2
+            values = hps.each_cons(2).collect do |a|
+              [
+                a[0].valid_from,
+                a[1].valid_from,
+                a[0].value
+              ]
+            end
+          end
+          lv = hps.last
+          if lv
+            values + [[lv.valid_from, nil, lv.value]]
+          else
+            nil
+          end
+        end      
+      EOM
     end
 
     def define_historical_sum(name)
@@ -79,16 +83,12 @@ module ActsAsHistoricalParameter
     end
 
     def acts_as_historical_parameter(name, ident)
-      unless defined? historical_parameters
-        has_many :historical_parameters, :as => :parameterized
-        accepts_nested_attributes_for :historical_parameters
-      end
       ass_sym = "#{name}_history".to_sym
       has_many ass_sym, :as => :parameterized, :class_name => "HistoricalParameter", :conditions => {:ident => ident}
       accepts_nested_attributes_for ass_sym
-      define_historical_getter(name, ident)
-      define_historical_setter(name, ident)
-      define_historical_values(name, ident)
+      define_historical_getter(name)
+      define_historical_setter(name)
+      define_historical_values(name)
       define_historical_sum(name)
     end
   end
