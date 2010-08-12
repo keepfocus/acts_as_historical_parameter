@@ -105,4 +105,22 @@ class ActsAsHistoricalParameterTest < ActiveSupport::TestCase
     assert_equal expected, installation.area_values
   end
 
+  test "destroy line in history through model" do
+    installation = Installation.new
+    installation.update_attributes({
+      :area_history_attributes => [
+        {:valid_from => Time.zone.local(2010, 1, 1), :value => 42},
+        {:valid_from => Time.zone.local(2010, 2, 1), :value => 43}
+      ]
+    })
+    installation.save
+    assert_difference 'installation.area_history.count', -1 do
+      installation.update_attributes({
+        :area_history_attributes => [
+          {:id => installation.area_history.first.id, :_destroy => true}
+        ]
+      })
+    end
+  end
+
 end
