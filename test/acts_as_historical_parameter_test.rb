@@ -3,10 +3,6 @@ require 'test_helper'
 class ActsAsHistoricalParameterTest < ActiveSupport::TestCase
   load_schema
 
-  class Installation < ActiveRecord::Base
-    acts_as_historical_parameter :area, 1
-  end
-
   def setup
     Installation.delete_all
     HistoricalParameter.delete_all

@@ -3,15 +3,11 @@ require 'test_helper'
 class ActsAsHistoricalParameterTest < ActiveSupport::TestCase
   load_schema
 
-  class Installation < ActiveRecord::Base
-    acts_as_historical_parameter :area, 1
-  end
-
   setup do
     @template = ActionView::Base.new
     @template.output_buffer = ""
     stub(@template).url_for { "" }
-    stub(@template).projects_path { "" }
+    stub(@template).installations_path { "" }
     stub(@template).protect_against_forgery? { false }
   end  
 
