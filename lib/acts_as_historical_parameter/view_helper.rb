@@ -1,9 +1,14 @@
 module ActsAsHistoricalParameter
   module ViewHelper
     def historical_form_for(*args, &block)
-      @after_historical_form_callbacks.collect do |callback|
-        callback.call
-      end.join("")
+      output = form_for(*args, &block)
+      if @after_historical_form_callbacks
+        fields = @after_historical_form_callbacks.collect do |callback|
+          callback.call
+        end
+        output << fields.join("")
+      end
+      output
     end
 
     def after_historical_form(&block)
