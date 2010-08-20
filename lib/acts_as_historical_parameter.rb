@@ -10,6 +10,8 @@
   end
 end
 
+require 'acts_as_historical_parameter/view_helper.rb'
+
 module ActsAsHistoricalParameter
   def self.included(base)
     base.extend(ClassMethods)
