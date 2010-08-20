@@ -1,9 +1,9 @@
 require 'test_helper'
 
-class ActsAsHistoricalParameterTest < ActiveSupport::TestCase
+class HistoricalEditFormTest < ActiveSupport::TestCase
   load_schema
 
-  setup do
+  def setup
     @template = ActionView::Base.new
     @template.output_buffer = ""
     stub(@template).url_for { "" }
