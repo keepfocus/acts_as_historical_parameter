@@ -29,6 +29,8 @@ class HistoricalEditFormTest < ActiveSupport::TestCase
       @template.after_historical_form { "456" }
     }
     assert_match /<form[^>]*>.*<\/form>.*123456/, output
+    assert_no_match /<form[^>]*>.*123.*<\/form>/, output
+    assert_no_match /<form[^>]*>.*456.*<\/form>/, output
   end
 
 end
