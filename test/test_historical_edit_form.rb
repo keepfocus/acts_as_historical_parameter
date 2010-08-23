@@ -1,6 +1,6 @@
-require 'test_helper'
+require File.join(File.dirname(__FILE__), 'test_helper')
 
-class HistoricalEditFormTest < ActiveSupport::TestCase
+class TestHistoricalEditForm < ActiveSupport::TestCase
   load_schema
 
   def setup

@@ -1,6 +1,6 @@
-require 'test_helper'
+require File.join(File.dirname(__FILE__), 'test_helper')
 
-class HistoricalParameterTest < ActiveSupport::TestCase
+class TestHistoricalParameter < ActiveSupport::TestCase
   load_schema
 
   def test_historical_parameter
