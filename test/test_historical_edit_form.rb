@@ -7,6 +7,7 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     @template = ActionView::Base.new
     @template.output_buffer = ""
     stub(@template).url_for { "" }
+    stub(@template).installation_path { "" }
     stub(@template).installations_path { "" }
     stub(@template).protect_against_forgery? { false }
   end  
@@ -32,6 +33,18 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     assert_select_string output, "form ~ span#inside"
     assert_select_string output, "form span#before", false
     assert_select_string output, "form span#inside", false
+  end
+
+  test "historical_value_fields inserts fields required for a value" do
+    value = HistoricalParameter.new
+    output = @template.fields_for 'area_history', value, :builder => ActsAsHistoricalParameter::HistoricalFormBuilder do |b|
+      @template.concat b.historical_value_fields
+    end
+    assert_select_string output, "input[name=?][type=text]", "area_history[value]"
+    assert_select_string output, "select[name=?]", "area_history[valid_from(1i)]"
+    assert_select_string output, "select[name=?]", "area_history[valid_from(2i)]"
+    assert_select_string output, "select[name=?]", "area_history[valid_from(3i)]"
+    assert_select_string output, "input[name=?][type=checkbox]", "area_history[_destroy]"
   end
 
   test "new_history_value_button is inserted into form" do
