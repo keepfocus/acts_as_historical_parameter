@@ -33,4 +33,12 @@ class HistoricalEditFormTest < ActiveSupport::TestCase
     assert_no_match /<form[^>]*>.*456.*<\/form>/, output
   end
 
+  test "add_new_button is inserted into form" do
+    output = @template.historical_form_for(Installation.new) { |f|
+      f.new_history_value_button :area
+    }
+    assert_match /<form[^>]*>.*<input.*type="submit".*>.*<\/form>/, output
+    assert_match /<form[^>]*>.*<input.*class="add_historical_value".*>.*<\/form>/, output
+  end
+
 end
