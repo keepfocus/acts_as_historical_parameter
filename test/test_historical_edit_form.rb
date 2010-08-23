@@ -24,21 +24,21 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
   end
   
   test "after_historical_form content comes after form" do
-    @template.after_historical_form { "123" }
+    @template.after_historical_form { @template.content_tag :span, "1", :id => "before" }
     output = @template.historical_form_for(Installation.new) {
-      @template.after_historical_form { "456" }
+      @template.after_historical_form { @template.content_tag :span, "1", :id => "inside" }
     }
-    assert_match /<form[^>]*>.*<\/form>.*123456/, output
-    assert_no_match /<form[^>]*>.*123.*<\/form>/, output
-    assert_no_match /<form[^>]*>.*456.*<\/form>/, output
+    assert_select_string output, "form ~ span#before"
+    assert_select_string output, "form ~ span#inside"
+    assert_select_string output, "form span#before", false
+    assert_select_string output, "form span#inside", false
   end
 
-  test "add_new_button is inserted into form" do
+  test "new_history_value_button is inserted into form" do
     output = @template.historical_form_for(Installation.new) { |f|
       f.new_history_value_button :area
     }
-    assert_match /<form[^>]*>.*<input.*type="submit".*>.*<\/form>/, output
-    assert_match /<form[^>]*>.*<input.*class="add_historical_value".*>.*<\/form>/, output
+    assert_select_string output, "form input.add_historical_value[type=submit][data-association=area]"
   end
 
 end

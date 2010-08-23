@@ -12,6 +12,7 @@ end
 
 class ActiveSupport::TestCase
   include RR::Adapters::TestUnit
+  include ActionDispatch::Assertions
 
   def self.load_schema
     config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
@@ -39,4 +40,10 @@ class ActiveSupport::TestCase
     ActiveRecord::Base.establish_connection(config[db_adapter])
     load(File.dirname(__FILE__) + "/schema.rb")
   end
+
+  def assert_select_string(string, *selectors, &block)
+    doc_root = HTML::Document.new(string).root
+    assert_select(doc_root, *selectors, &block)
+  end
+  
 end

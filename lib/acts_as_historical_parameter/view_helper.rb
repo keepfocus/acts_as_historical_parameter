@@ -4,10 +4,9 @@ module ActsAsHistoricalParameter
       options = args.extract_options!.reverse_merge(:builder => ActsAsHistoricalParameter::HistoricalFormBuilder)
       output = form_for(*args << options, &block)
       if @after_historical_form_callbacks
-        fields = @after_historical_form_callbacks.collect do |callback|
-          callback.call
+        fields = @after_historical_form_callbacks.each do |callback|
+          output << callback.call
         end
-        output << fields.join("")
       end
       output
     end
