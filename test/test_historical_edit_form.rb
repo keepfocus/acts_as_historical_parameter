@@ -47,11 +47,17 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     assert_select_string output, "input[name=?][type=checkbox]", "area_history[_destroy]"
   end
 
-  test "new_history_value_button is inserted into form" do
+  test "new_history_value_button is inserted into form and template outside" do
     output = @template.historical_form_for(Installation.new) { |f|
       f.new_history_value_button :area
     }
-    assert_select_string output, "form input.add_historical_value[type=submit][data-association=area]"
+    assert_select_string output, "form.new_installation" do
+      assert_select "input.add_historical_value[type=submit][name=add_area_history_value][data-association=area_history]"
+      assert_select "input[name=?]", "installation[area_history_attribute][new_area_history][value]", false
+    end
+    assert_select_string output, "table#area_history_fields_template" do
+      assert_select "tbody tr td input[name=?]", "installation[area_history_attributes][new_area_history][value]"
+    end
   end
 
   test "history_edit_table_for should create table for editing values over time" do

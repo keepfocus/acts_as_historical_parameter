@@ -2,7 +2,22 @@ module ActsAsHistoricalParameter
   class HistoricalFormBuilder < ActionView::Helpers::FormBuilder
     def new_history_value_button(parameter, options = {})
       add_label = options.delete(:add_label) || "Add value"
-      self.submit add_label, :class => "add_historical_value", :name => "add_#{parameter}_value", :"data-association" => parameter.to_s
+      method = :"#{parameter}_history"
+      object = self.object.class.reflect_on_association(method).klass.new
+      @template.after_historical_form do
+        @template.content_tag :table, :id => "#{method}_fields_template" do
+          @template.content_tag :tbody do
+            fields_for method, object, :child_index => :"new_#{method}" do |f|
+              f.historical_value_fields
+            end
+          end
+        end
+      end
+      self.submit add_label, {
+        :class => "add_historical_value",
+        :name => "add_#{method}_value",
+        :"data-association" => method.to_s
+      }
     end
 
     def historical_value_fields
