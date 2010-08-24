@@ -54,4 +54,22 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     assert_select_string output, "form input.add_historical_value[type=submit][data-association=area]"
   end
 
+  test "history_edit_table_for should create table for editing values over time" do
+    installation = Installation.new
+    installation.area_history.build :value => 42, :valid_from => Time.zone.local(2010, 8, 1)
+    output = @template.historical_form_for(installation) { |f|
+      f.history_edit_table_for :area
+    }
+    assert_select_string output, "table > tbody" do
+      assert_select "tr", 2
+      assert_select "tr > th", "Value"
+      assert_select "tr th", "Valid from"
+      assert_select "tr td input[name=?]", "installation[area_history_attributes][0][value]", 1
+      assert_select "tr td select[name=?]", "installation[area_history_attributes][0][valid_from(1i)]", 1
+      assert_select "tr td select[name=?]", "installation[area_history_attributes][0][valid_from(2i)]", 1
+      assert_select "tr td select[name=?]", "installation[area_history_attributes][0][valid_from(3i)]", 1
+      assert_select "tr td input[name=?][type=checkbox]", "installation[area_history_attributes][0][_destroy]", 1
+    end
+  end
+
 end
