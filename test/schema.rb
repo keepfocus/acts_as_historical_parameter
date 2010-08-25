@@ -1,5 +1,5 @@
 ActiveRecord::Schema.define(:version => 0) do
-  create_table :installations, :force => true do |t|
+  create_table :dummy_installations, :force => true do |t|
     t.string :name
   end
   create_table :historical_parameters, :force => true do |t|

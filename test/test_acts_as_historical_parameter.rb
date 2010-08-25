@@ -2,35 +2,35 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 class TestActsAsHistoricalParameter < ActiveSupport::TestCase
   def setup
-    Installation.delete_all
+    DummyInstallation.delete_all
     HistoricalParameter.delete_all
   end
 
   test "schema has loaded correctly" do
-    assert_equal [], Installation.all
+    assert_equal [], DummyInstallation.all
     assert_equal [], HistoricalParameter.all
   end
 
   test "historic parameter works like regualar attribute" do
-    installation = Installation.new
+    installation = DummyInstallation.new
     installation.area = 42.0
     assert_equal 42.0, installation.area
   end
 
   test "historic parameter ignores set to nil value" do
-    installation = Installation.new
+    installation = DummyInstallation.new
     installation.area = 42.0
     installation.area = nil
     assert_equal 42.0, installation.area
   end
 
   test "historic parameter can be undefined" do
-    installation = Installation.new
+    installation = DummyInstallation.new
     assert_nil installation.area
   end
 
   test "historic parameter has a history" do
-    installation = Installation.new
+    installation = DummyInstallation.new
     installation.set_area(42, Time.zone.local(2010, 01, 01))
     installation.set_area(43, Time.zone.local(2010, 02, 01))
     assert_equal 43, installation.area
@@ -43,7 +43,7 @@ class TestActsAsHistoricalParameter < ActiveSupport::TestCase
   end
 
   test "callback history within timeslot for area #1" do
-    installation = Installation.new
+    installation = DummyInstallation.new
     installation.set_area(42, Time.zone.local(2010, 1, 1))
     installation.set_area(43, Time.zone.local(2010, 2, 1))
     installation.save
@@ -57,7 +57,7 @@ class TestActsAsHistoricalParameter < ActiveSupport::TestCase
   end
 
   test "callback history within timeslot for area #2" do
-    installation = Installation.new
+    installation = DummyInstallation.new
     installation.set_area(42, Time.zone.local(2010, 1, 1))
     installation.set_area(43, Time.zone.local(2010, 2, 1))
     installation.save
@@ -70,7 +70,7 @@ class TestActsAsHistoricalParameter < ActiveSupport::TestCase
   end
 
   test "callback history within timeslot for area #3" do
-    installation = Installation.new
+    installation = DummyInstallation.new
     installation.set_area(42, Time.zone.local(2010, 1, 1))
     installation.set_area(43, Time.zone.local(2010, 2, 1))
     installation.save
@@ -83,7 +83,7 @@ class TestActsAsHistoricalParameter < ActiveSupport::TestCase
   end
 
   test "edit parameter history through model" do
-    installation = Installation.new
+    installation = DummyInstallation.new
     installation.update_attributes({
       :area_history_attributes => [
         {:valid_from => Time.zone.local(2010, 1, 1), :value => 42},
@@ -100,7 +100,7 @@ class TestActsAsHistoricalParameter < ActiveSupport::TestCase
   end
 
   test "destroy line in history through model" do
-    installation = Installation.new
+    installation = DummyInstallation.new
     installation.update_attributes({
       :area_history_attributes => [
         {:valid_from => Time.zone.local(2010, 1, 1), :value => 42},

@@ -9,7 +9,7 @@ class DummyInstallationsController < ActionController::Base
   end
 
   def update
-    @installation = Installation.find(params[:id])
+    @installation = DummyInstallation.find(params[:id])
     return if handle_add_value(@installation, :area_history, params[:installation])
 
     respond_to do |format|
@@ -31,7 +31,7 @@ class TestHistoricalControllerAddons < ActionController::TestCase
   end
 
   test "Update works for value add" do
-    @installation = Installation.create(:name => "original")
+    @installation = DummyInstallation.create(:name => "original")
       
     put :update, :id => @installation.to_param, :add_area_history_value => "test", :installation => {
       :name => "changed"
@@ -40,11 +40,11 @@ class TestHistoricalControllerAddons < ActionController::TestCase
     assert_not_nil assigns(:installation)
     assert assigns(:installation).area_history.last.new_record?
     assert_equal "changed", assigns(:installation).name
-    assert_equal "original", Installation.find(@installation.to_param).name
+    assert_equal "original", DummyInstallation.find(@installation.to_param).name
   end
 
   test "Update works for save new state" do
-    @installation = Installation.create(:name => "original")
+    @installation = DummyInstallation.create(:name => "original")
     put :update, :id => @installation.to_param, :installation => {
       :area_history_attributes => [
         {:value => 42, :valid_from => Time.zone.local(2010, 1, 1)},
@@ -53,7 +53,7 @@ class TestHistoricalControllerAddons < ActionController::TestCase
       :name => "changed"
     }
     assert_redirected_to dummy_installation_path(@installation)
-    assert_equal "changed", Installation.find(@installation.to_param).name
-    assert_equal 42, Installation.find(@installation.to_param).area
+    assert_equal "changed", DummyInstallation.find(@installation.to_param).name
+    assert_equal 42, DummyInstallation.find(@installation.to_param).area
   end
 end

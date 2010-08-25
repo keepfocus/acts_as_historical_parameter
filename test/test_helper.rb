@@ -6,7 +6,7 @@ require 'test/unit'
 require 'rr'
 require File.expand_path(File.join(ENV['RAILS_ROOT'], 'config/environment.rb'))
 
-class Installation < ActiveRecord::Base
+class DummyInstallation < ActiveRecord::Base
   acts_as_historical_parameter :area, 1
 end
 
