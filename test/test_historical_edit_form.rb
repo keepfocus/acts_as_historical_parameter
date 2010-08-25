@@ -1,8 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 class TestHistoricalEditForm < ActiveSupport::TestCase
-  load_schema
-
   def setup
     @template = ActionView::Base.new
     @template.output_buffer = ""

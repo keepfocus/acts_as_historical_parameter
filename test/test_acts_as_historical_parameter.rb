@@ -1,8 +1,6 @@
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 class TestActsAsHistoricalParameter < ActiveSupport::TestCase
-  load_schema
-
   def setup
     Installation.delete_all
     HistoricalParameter.delete_all
