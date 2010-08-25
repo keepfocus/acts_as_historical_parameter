@@ -27,7 +27,6 @@ class TestHistoricalControllerAddons < ActionController::TestCase
 
   def setup
     ActionController::Routing::Routes.draw {|map| map.resources :dummy_installations }
-    @routes = Rails.application.routes
   end
 
   test "Update works for value add" do

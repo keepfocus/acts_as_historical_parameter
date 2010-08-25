@@ -5,6 +5,7 @@ require 'rubygems'
 require 'test/unit'
 require 'rr'
 require File.expand_path(File.join(ENV['RAILS_ROOT'], 'config/environment.rb'))
+require 'active_support/test_case'
 
 class DummyInstallation < ActiveRecord::Base
   acts_as_historical_parameter :area, 1
@@ -12,7 +13,7 @@ end
 
 class ActiveSupport::TestCase
   include RR::Adapters::TestUnit
-  include ActionDispatch::Assertions
+  include ActionController::Assertions::SelectorAssertions
 
   def self.load_schema
     config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))

@@ -5,13 +5,13 @@ module ActsAsHistoricalParameter
       method = :"#{parameter}_history"
       object = self.object.class.reflect_on_association(method).klass.new
       @template.after_historical_form do
-        @template.content_tag :table, :id => "#{method}_fields_template" do
-          @template.content_tag :tbody do
-            fields_for method, object, :child_index => :"new_#{method}" do |f|
-              f.historical_value_fields
-            end
-          end
+        @template.concat %Q[<table id="#{method}_fields_template">]
+        @template.concat '<tbody>'
+        fields_for method, object, :child_index => :"new_#{method}" do |f|
+          @template.concat f.historical_value_fields
         end
+        @template.concat '</tbody>'
+        @template.concat '</table>'
       end
       self.submit add_label, {
         :class => "add_historical_value",

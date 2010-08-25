@@ -11,22 +11,34 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
   end  
 
   test "historical_form_for creates form" do
-    output = @template.historical_form_for(DummyInstallation.new) {}
-    assert_match /<form[^>]*>.*<\/form>/, output
+    @template.historical_form_for(DummyInstallation.new) {}
+    assert_match /<form[^>]*>.*<\/form>/, @template.output_buffer
   end
 
-  test "historical_form_for appends content to end of nested form" do
-    @template.after_historical_form { "123" }
-    @template.after_historical_form { "456" }
-    output = @template.historical_form_for(DummyInstallation.new) {}
-    assert output.include? "123456"
+  test "historical_form_for passes form builder to form_for along with other options" do
+    mock(@template).form_for(:first, :second, :other => :arg, :builder => ActsAsHistoricalParameter::HistoricalFormBuilder)
+    @template.historical_form_for(:first, :second, :other => :arg)
   end
-  
+
+  test "instance of ActsAsHistoricalParameter::HistoricalFormBuilder is passed to historical_form_for block" do
+    @template.historical_form_for(:dummy_installation, DummyInstallation) do |f|
+      assert_instance_of ActsAsHistoricalParameter::HistoricalFormBuilder, f
+    end
+  end
+ 
+  test "historical_form_for appends content to end of nested form" do
+    @template.after_historical_form { @template.concat "123" }
+    @template.after_historical_form { @template.concat "456" }
+    @template.historical_form_for(DummyInstallation.new) {}
+    assert @template.output_buffer.include? "123456"
+  end
+ 
   test "after_historical_form content comes after form" do
-    @template.after_historical_form { @template.content_tag :span, "1", :id => "before" }
-    output = @template.historical_form_for(DummyInstallation.new) {
-      @template.after_historical_form { @template.content_tag :span, "1", :id => "inside" }
+    @template.after_historical_form { @template.concat '<span id="before">1</span>' }
+    @template.historical_form_for(DummyInstallation.new) {
+      @template.after_historical_form { @template.concat '<span id="inside">1</span>' }
     }
+    output = @template.output_buffer
     assert_select_string output, "form ~ span#before"
     assert_select_string output, "form ~ span#inside"
     assert_select_string output, "form span#before", false
@@ -35,9 +47,10 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
 
   test "historical_value_fields inserts fields required for a value" do
     value = HistoricalParameter.new
-    output = @template.fields_for 'area_history', value, :builder => ActsAsHistoricalParameter::HistoricalFormBuilder do |b|
+    @template.fields_for 'area_history', value, :builder => ActsAsHistoricalParameter::HistoricalFormBuilder do |b|
       @template.concat b.historical_value_fields
     end
+    output = @template.output_buffer
     assert_select_string output, "input[name=?][type=text]", "area_history[value]"
     assert_select_string output, "select[name=?]", "area_history[valid_from(1i)]"
     assert_select_string output, "select[name=?]", "area_history[valid_from(2i)]"
@@ -46,9 +59,10 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
   end
 
   test "new_history_value_button is inserted into form and template outside" do
-    output = @template.historical_form_for(DummyInstallation.new) { |f|
-      f.new_history_value_button :area
+    @template.historical_form_for(DummyInstallation.new) { |f|
+      @template.concat f.new_history_value_button :area
     }
+    output = @template.output_buffer
     assert_select_string output, "form.new_dummy_installation" do
       assert_select "input.add_historical_value[type=submit][name=add_area_history_value][data-association=area_history]"
       assert_select "input[name=?]", "dummy_installation[area_history_attribute][new_area_history][value]", false
@@ -65,9 +79,10 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
   test "history_edit_table_for should create table for editing values over time" do
     installation = DummyInstallation.new
     installation.area_history.build :value => 42, :valid_from => Time.zone.local(2010, 8, 1)
-    output = @template.historical_form_for(installation) { |f|
-      f.history_edit_table_for :area
+    @template.historical_form_for(installation) { |f|
+      @template.concat f.history_edit_table_for :area
     }
+    output = @template.output_buffer
     assert_select_string output, "table > tbody" do
       assert_select "tr", 2
       assert_select "tr > th", "Value"
