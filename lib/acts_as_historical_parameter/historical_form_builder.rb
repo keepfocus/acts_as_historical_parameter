@@ -28,7 +28,7 @@ module ActsAsHistoricalParameter
         o += @template.content_tag :td do
           self.datetime_select(:valid_from)
         end
-        o += @template.content_tag :td do
+        o += @template.content_tag :td, :class => "destroy_historical_value" do
           self.check_box(:_destroy) + self.label(:_destroy, "Remove?")
         end
         o

@@ -76,7 +76,9 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
       assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(1i)]", 1
       assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(2i)]", 1
       assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(3i)]", 1
-      assert_select "tr td input[name=?][type=checkbox]", "dummy_installation[area_history_attributes][0][_destroy]", 1
+      assert_select "tr td.destroy_historical_value" do
+        assert_select "input[name=?][type=checkbox]", "dummy_installation[area_history_attributes][0][_destroy]", 1
+      end
     end
   end
 
