@@ -68,7 +68,7 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     output = @template.historical_form_for(installation) { |f|
       f.history_edit_table_for :area
     }
-    assert_select_string output, "table > tbody" do
+    assert_select_string output, "table#area_history_table > tbody" do
       assert_select "tr", 2
       assert_select "tr > th", "Value"
       assert_select "tr th", "Valid from"

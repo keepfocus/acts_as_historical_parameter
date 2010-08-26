@@ -36,12 +36,13 @@ module ActsAsHistoricalParameter
     end
 
     def history_edit_table_for(parameter)
-      @template.content_tag :table do
+      method = :"#{parameter}_history"
+      @template.content_tag :table, :id => "#{method}_table" do
         @template.content_tag :tbody do
           o = @template.content_tag :tr do
             @template.content_tag(:th, "Value") + @template.content_tag(:th, "Valid from")
           end
-          o += self.fields_for :"#{parameter}_history" do |b|
+          o += self.fields_for method do |b|
             b.historical_value_fields
           end
           o
