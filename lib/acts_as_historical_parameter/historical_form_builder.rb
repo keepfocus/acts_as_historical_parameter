@@ -43,7 +43,7 @@ module ActsAsHistoricalParameter
             @template.content_tag(:th, "Value") + @template.content_tag(:th, "Valid from")
           end
           o += self.fields_for method do |b|
-            b.historical_value_fields
+            @template.concat b.historical_value_fields
           end
           o
         end

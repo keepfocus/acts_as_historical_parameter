@@ -80,4 +80,30 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     end
   end
 
+  test "history_edit_table_for should also work for saved and reloaded instance" do
+    di = DummyInstallation.new
+    di.area_history.build :value => 42, :valid_from => Time.zone.local(2010, 1, 1)
+    di.area_history.build :value => 43, :valid_from => Time.zone.local(2010, 8, 1)
+    di.save!
+    installation = DummyInstallation.find(di.to_param)
+    output = @template.historical_form_for(installation) { |f|
+      f.history_edit_table_for :area
+    }
+    assert_select_string output, "table#area_history_table > tbody" do
+      assert_select "tr", 3
+      assert_select "tr > th", "Value"
+      assert_select "tr th", "Valid from"
+      assert_select "tr td input[name=?]", "dummy_installation[area_history_attributes][0][value]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(1i)]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(2i)]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(3i)]", 1
+      assert_select "tr td input[name=?][type=checkbox]", "dummy_installation[area_history_attributes][0][_destroy]", 1
+      assert_select "tr td input[name=?]", "dummy_installation[area_history_attributes][1][value]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][1][valid_from(1i)]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][1][valid_from(2i)]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][1][valid_from(3i)]", 1
+      assert_select "tr td input[name=?][type=checkbox]", "dummy_installation[area_history_attributes][1][_destroy]", 1
+    end
+  end
+
 end
