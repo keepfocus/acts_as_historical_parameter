@@ -5,7 +5,7 @@ module ActsAsHistoricalParameter
       method = :"#{parameter}_history"
       object = self.object.class.reflect_on_association(method).klass.new
       @template.after_historical_form do
-        @template.concat %Q[<table id="#{method}_fields_template"><tbody>]
+        @template.concat %Q[<table id="#{method}_fields_template" style="display:none;"><tbody>]
         fields_for method, object, :child_index => :"new_#{method}" do |f|
           @template.concat f.historical_value_fields
         end
