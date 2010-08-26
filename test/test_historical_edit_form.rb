@@ -5,8 +5,8 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     @template = ActionView::Base.new
     @template.output_buffer = ""
     stub(@template).url_for { "" }
-    stub(@template).installation_path { "" }
-    stub(@template).installations_path { "" }
+    stub(@template).dummy_installation_path { "" }
+    stub(@template).dummy_installations_path { "" }
     stub(@template).protect_against_forgery? { false }
   end  
 
