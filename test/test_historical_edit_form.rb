@@ -91,7 +91,9 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
       assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(1i)]", 1
       assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(2i)]", 1
       assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(3i)]", 1
-      assert_select "tr td input[name=?][type=checkbox]", "dummy_installation[area_history_attributes][0][_destroy]", 1
+      assert_select "tr td.destroy_historical_value" do
+        assert_select "input[name=?][type=checkbox]", "dummy_installation[area_history_attributes][0][_destroy]", 1
+      end      
     end
   end
 
@@ -105,7 +107,7 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
       f.history_edit_table_for :area
     }
     output = @template.output_buffer
-    assert_select_string output, "table > tbody" do
+    assert_select_string output, "table#area_history_table > tbody" do
       assert_select "input[name=?]", "dummy_installation[area_history_attributes][0][id]", 1
       assert_select "input[name=?]", "dummy_installation[area_history_attributes][1][id]", 1
       assert_select "tr", 3

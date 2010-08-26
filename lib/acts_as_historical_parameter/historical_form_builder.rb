@@ -28,7 +28,7 @@ module ActsAsHistoricalParameter
         o += @template.content_tag :td do
           self.datetime_select(:valid_from)
         end
-        o += @template.content_tag :td do
+        o += @template.content_tag :td, :class => "destroy_historical_value" do
           self.check_box(:_destroy) + self.label(:_destroy, "Remove?")
         end
         o
@@ -36,9 +36,10 @@ module ActsAsHistoricalParameter
     end
 
     def history_edit_table_for(parameter)
-      @template.concat '<table><tbody>'
+      method = :"#{parameter}_history"
+      @template.concat %Q[<table id="#{method}_table"><tbody>]
       @template.concat '<tr><th>Value</th><th>Valid from</th></tr>'
-      self.fields_for :"#{parameter}_history" do |b|
+      self.fields_for method do |b|
         @template.concat b.historical_value_fields
       end
       @template.concat '</tbody></table>'
