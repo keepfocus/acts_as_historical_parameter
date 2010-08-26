@@ -76,9 +76,27 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
       assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(1i)]", 1
       assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(2i)]", 1
       assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(3i)]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(4i)]", false
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(5i)]", false
       assert_select "tr td.destroy_historical_value" do
         assert_select "input[name=?][type=checkbox]", "dummy_installation[area_history_attributes][0][_destroy]", 1
       end
+    end
+  end
+
+  test "history_edit_table_for should allow time edit if requested" do
+    installation = DummyInstallation.new
+    installation.area_history.build :value => 42, :valid_from => Time.zone.local(2010, 8, 1)
+    output = @template.historical_form_for(installation) { |f|
+      f.history_edit_table_for :area, :show_time => true
+    }
+    assert_select_string output, "table#area_history_table > tbody" do
+      assert_select "tr td input[name=?]", "dummy_installation[area_history_attributes][0][value]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(1i)]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(2i)]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(3i)]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(4i)]", 1
+      assert_select "tr td select[name=?]", "dummy_installation[area_history_attributes][0][valid_from(5i)]", 1
     end
   end
 
