@@ -5,7 +5,7 @@ module ActsAsHistoricalParameter
       method = :"#{parameter}_history"
       object = self.object.class.reflect_on_association(method).klass.new
       @template.after_historical_form do
-        @template.content_tag :table, :id => "#{method}_fields_template" do
+        @template.content_tag :table, :id => "#{method}_fields_template", :style => "display:none;" do
           @template.content_tag :tbody do
             fields_for method, object, :child_index => :"new_#{method}" do |f|
               f.historical_value_fields
