@@ -76,7 +76,11 @@ module ActsAsHistoricalParameter
                   yield entry[0], entry[1], entry[2]
                 end
               elsif entry[1].nil? and end_time > entry[0]
-                yield entry[0], end_time, entry[2]
+                if start_time > entry[0]
+                  yield start_time, end_time, entry[2]
+                else
+                  yield entry[0], end_time, entry[2]
+                end
               else
                 0
               end
