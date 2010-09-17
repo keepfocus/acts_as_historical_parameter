@@ -47,7 +47,7 @@ module ActsAsHistoricalParameter
             hps = #{name}_history.all(:order => "valid_from")
             values = []
             if hps.length >= 2
-              values = hps.each_cons(2).collect do |a|
+              values = hps.enum_cons(2).collect do |a|
                 [
                   a[0].valid_from,
                   a[1].valid_from,
