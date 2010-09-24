@@ -195,4 +195,32 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     end
   end
 
+  test "history_edit_table_for should translate headings in table" do
+    I18n.backend.store_translations :en, :acts_as_historical_parameter => {:value => "Værdi"}
+    I18n.backend.store_translations :en, :acts_as_historical_parameter => {:valid_from => "Gælder fra"}
+    installation = DummyInstallation.new
+    installation.area_history.build :value => 42, :valid_from => Time.zone.local(2010, 8, 1)
+    output = @template.historical_form_for(installation) { |f|
+      f.history_edit_table_for :area
+    }
+    assert_select_string output, "table#area_history_table > tbody" do
+      assert_select "tr", 2
+      assert_select "tr > th", "Værdi"
+      assert_select "tr th", "Gælder fra"
+    end
+  end
+
+  test "history_edit_table_for should support forced headings in table" do
+    installation = DummyInstallation.new
+    installation.area_history.build :value => 42, :valid_from => Time.zone.local(2010, 8, 1)
+    output = @template.historical_form_for(installation) { |f|
+      f.history_edit_table_for :area, :value_heading => "Areal", :valid_from_heading => "Gælder fra"
+    }
+    assert_select_string output, "table#area_history_table > tbody" do
+      assert_select "tr", 2
+      assert_select "tr > th", "Areal"
+      assert_select "tr th", "Gælder fra"
+    end
+  end
+
 end
