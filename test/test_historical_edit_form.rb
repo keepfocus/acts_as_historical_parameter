@@ -126,4 +126,33 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     end
   end
 
+  test "new_history_value_button uses default if no translation present" do
+    I18n.reload!
+    output = @template.historical_form_for(DummyInstallation.new) { |f|
+      f.new_history_value_button :area
+    }
+    assert_select_string output, "form.new_dummy_installation" do
+      assert_select "input.add_historical_value[value=?]", "Add value"
+    end
+  end
+
+  test "new_history_value_button is translated if translation present" do
+    I18n.backend.store_translations :en, :acts_as_historical_parameter => {:new_history_value => "Ny værdi"}
+    output = @template.historical_form_for(DummyInstallation.new) { |f|
+      f.new_history_value_button :area
+    }
+    assert_select_string output, "form.new_dummy_installation" do
+      assert_select "input.add_historical_value[value=?]", "Ny værdi"
+    end
+  end
+
+  test "new_history_value_button can have forced label" do
+    output = @template.historical_form_for(DummyInstallation.new) { |f|
+      f.new_history_value_button :area, :add_label => "Ny areal værdi"
+    }
+    assert_select_string output, "form.new_dummy_installation" do
+      assert_select "input.add_historical_value[value=?]", "Ny areal værdi"
+    end
+  end
+
 end
