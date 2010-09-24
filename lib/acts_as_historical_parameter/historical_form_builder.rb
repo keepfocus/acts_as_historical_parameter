@@ -41,7 +41,10 @@ module ActsAsHistoricalParameter
     def history_edit_table_for(parameter, options ={})
       method = :"#{parameter}_history"
       @template.concat %Q[<table id="#{method}_table"><tbody>]
-      @template.concat '<tr><th>Value</th><th>Valid from</th></tr>'
+      @template.concat '<tr>'
+      @template.concat "<th>#{options[:value_heading] || I18n.t('acts_as_historical_parameter.value', :default =>"Value")}</th>"
+      @template.concat "<th>#{options[:valid_from_heading] || I18n.t('acts_as_historical_parameter.valid_from', :default => "Valid from")}</th>"
+      @template.concat '</tr>'
       self.fields_for method do |b|
         @template.concat b.historical_value_fields(options)
       end
