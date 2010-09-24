@@ -2,6 +2,7 @@ require File.join(File.dirname(__FILE__), 'test_helper')
 
 class TestHistoricalEditForm < ActiveSupport::TestCase
   def setup
+    I18n.reload!
     @template = ActionView::Base.new
     @template.output_buffer = ""
     stub(@template).url_for { "" }
@@ -127,7 +128,6 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
   end
 
   test "new_history_value_button uses default if no translation present" do
-    I18n.reload!
     output = @template.historical_form_for(DummyInstallation.new) { |f|
       f.new_history_value_button :area
     }
@@ -136,7 +136,7 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     end
   end
 
-  test "new_history_value_button is translated if translation present" do
+  test "new_history_value_button is translated" do
     I18n.backend.store_translations :en, :acts_as_historical_parameter => {:new_history_value => "Ny værdi"}
     output = @template.historical_form_for(DummyInstallation.new) { |f|
       f.new_history_value_button :area
@@ -152,6 +152,46 @@ class TestHistoricalEditForm < ActiveSupport::TestCase
     }
     assert_select_string output, "form.new_dummy_installation" do
       assert_select "input.add_historical_value[value=?]", "Ny areal værdi"
+    end
+  end
+
+  test "history_edit_table_for should have default remove label if no translation present" do
+    installation = DummyInstallation.new
+    installation.area_history.build :value => 42, :valid_from => Time.zone.local(2010, 8, 1)
+    output = @template.historical_form_for(installation) { |f|
+      f.history_edit_table_for :area
+    }
+    assert_select_string output, "table#area_history_table > tbody" do
+      assert_select "tr td.destroy_historical_value" do
+        assert_select "label[for=?]", "dummy_installation_area_history_attributes_0__destroy", :text => "Remove?"
+      end
+    end
+  end
+
+  test "history_edit_table_for should translate remove label" do
+    I18n.backend.store_translations :en, :acts_as_historical_parameter => {:destroy_label => "Slet værdi"}
+    installation = DummyInstallation.new
+    installation.area_history.build :value => 42, :valid_from => Time.zone.local(2010, 8, 1)
+    output = @template.historical_form_for(installation) { |f|
+      f.history_edit_table_for :area
+    }
+    assert_select_string output, "table#area_history_table > tbody" do
+      assert_select "tr td.destroy_historical_value" do
+        assert_select "label[for=?]", "dummy_installation_area_history_attributes_0__destroy", :text => "Slet værdi"
+      end
+    end
+  end
+
+  test "history_edit_table_for should support forced remove label" do
+    installation = DummyInstallation.new
+    installation.area_history.build :value => 42, :valid_from => Time.zone.local(2010, 8, 1)
+    output = @template.historical_form_for(installation) { |f|
+      f.history_edit_table_for :area, :remove_label => "Slet areal værdi"
+    }
+    assert_select_string output, "table#area_history_table > tbody" do
+      assert_select "tr td.destroy_historical_value" do
+        assert_select "label[for=?]", "dummy_installation_area_history_attributes_0__destroy", :text => "Slet areal værdi"
+      end
     end
   end
 

@@ -33,7 +33,8 @@ module ActsAsHistoricalParameter
           end
         end
         o += @template.content_tag :td, :class => "destroy_historical_value" do
-          self.check_box(:_destroy) + self.label(:_destroy, "Remove?")
+          self.check_box(:_destroy) +
+          self.label(:_destroy, options[:remove_label] || I18n.t('acts_as_historical_parameter.destroy_label', :default => "Remove?"))
         end
         o
       end
