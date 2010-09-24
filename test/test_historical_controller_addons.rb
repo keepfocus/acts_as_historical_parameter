@@ -26,7 +26,7 @@ class TestHistoricalControllerAddons < ActionController::TestCase
   tests DummyInstallationsController
 
   def setup
-    ActionController::Routing::Routes.draw {|map| map.resources :dummy_installations }
+    Rails.application.routes.draw { resources :dummy_installations }
     @routes = Rails.application.routes
   end
 
