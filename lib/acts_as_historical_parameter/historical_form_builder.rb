@@ -1,7 +1,7 @@
 module ActsAsHistoricalParameter
   class HistoricalFormBuilder < ActionView::Helpers::FormBuilder
     def new_history_value_button(parameter, options = {})
-      add_label = options.delete(:add_label) || "Add value"
+      add_label = options.delete(:add_label) || I18n.t('acts_as_historical_parameter.new_history_value', :default => "Add value")
       method = :"#{parameter}_history"
       object = self.object.class.reflect_on_association(method).klass.new
       @template.after_historical_form do
