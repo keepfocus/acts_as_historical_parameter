@@ -1,3 +1,4 @@
+# coding: utf-8
 require File.join(File.dirname(__FILE__), 'test_helper')
 
 class TestHistoricalEditForm < ActiveSupport::TestCase
