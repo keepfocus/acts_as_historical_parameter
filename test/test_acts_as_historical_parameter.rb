@@ -82,6 +82,19 @@ class TestActsAsHistoricalParameter < ActiveSupport::TestCase
     assert_equal 42, result
   end
 
+  test "callback history within timeslot for area #5" do
+    installation = DummyInstallation.new
+    installation.set_area(42, Time.zone.local(2010, 1, 1))
+    installation.set_area(43, Time.zone.local(2010, 3, 1))
+    installation.save
+    dummy = Object.new
+    mock(dummy).calculate(Time.zone.local(2010, 1, 15), Time.zone.local(2010, 2, 1)) {1}
+    result = installation.area_sum(Time.zone.local(2010, 1, 15), Time.zone.local(2010, 2, 1)) do |t1, t2, value|
+      dummy.calculate(t1, t2) * value
+    end
+    assert_equal 42, result
+  end
+
   test "callback history within timeslot for area #4" do
     start_time = 2.days.ago.beginning_of_day
     installation = DummyInstallation.new

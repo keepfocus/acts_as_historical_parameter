@@ -70,10 +70,11 @@ module ActsAsHistoricalParameter
           def #{name}_sum(start_time, end_time)
             #{name}_values.sum do |entry|
               if entry[1] and start_time < entry[1]
+                stop = entry[1] < end_time ? entry[1] : end_time
                 if start_time > entry[0]
-                  yield start_time, entry[1], entry[2]
+                  yield start_time, stop, entry[2]
                 else
-                  yield entry[0], entry[1], entry[2]
+                  yield entry[0], stop, entry[2]
                 end
               elsif entry[1].nil? and end_time > entry[0]
                 if start_time > entry[0]
